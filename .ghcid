@@ -1,0 +1,2 @@
+--command "stack ghci --main-is comp-math-lab5:exe:comp-math-lab5-exe"
+--test ":main"
