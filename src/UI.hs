@@ -10,35 +10,24 @@ import Model
 
 buildUI :: UIBuilder AppModel AppEvent
 buildUI _ model = tree where
-    tree = hstack_ [childSpacing_ 64]
+    tree = hstack_ [childSpacing_ 16]
         [ graphWithData_ points
-            [ wheelRate 2
+            [ lockX_ $ model ^. xLock
+            , lockY_ $ model ^. yLock
             ] `nodeKey` "mainGraph"
         , separatorLine
         , vstack_ [childSpacing_ 16]
-            [ hslider parameter (-2) 2
-            , button "Reset" AppResetGraph
+            [ button "Reset" AppResetGraph
+            , hgrid_ [childSpacing_ 64]
+                [ labeledCheckbox "Lock X" xLock
+                , labeledCheckbox "Lock Y" yLock
+                ]
             ]
         ] `styleBasic` [padding 16]
     points =
         [
-            [ graphPoints $ (\x -> (x, cos $ p*x)) <$> xs
+            [ graphPoints $ (\x -> (x, cos x)) <$> xs
             , graphColor red
-            ]
-        ,   [ graphPoint $ model ^. yellowPos
-            , graphColor yellow
-            , graphWidth 10
-            , graphHoverColor lightYellow
-            , graphActiveColor black
-            , graphSeparate
-            , graphOnChange $ AppYellowChange
-            ]
-        ,   [ graphPoints [(-1, 4), (0, 5), (1, 4), (0, 3)]
-            , graphColor blue
-            , graphSeparate
-            , graphFill
-            , graphFillAlpha 0.64
             ]
         ]
     xs = [-10, -9.98..10]
-    p = model ^. parameter
