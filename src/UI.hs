@@ -14,6 +14,7 @@ buildUI _ model = tree where
         [ graphWithData_ points
             [ lockX_ $ model ^. xLock
             , lockY_ $ model ^. yLock
+            , onRightClick AppAddPoint
             ] `nodeKey` "mainGraph"
         , separatorLine
         , vstack_ [childSpacing_ 16]
@@ -26,8 +27,8 @@ buildUI _ model = tree where
         ] `styleBasic` [padding 16]
     points =
         [
-            [ graphPoints $ (\x -> (x, cos x)) <$> xs
-            , graphColor red
+            [ graphPoints $ model ^. dataPoints
+            , graphColor black
+            , graphSeparate
             ]
         ]
-    xs = [-10, -9.98..10]
