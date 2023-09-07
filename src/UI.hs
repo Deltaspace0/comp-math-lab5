@@ -3,6 +3,7 @@ module UI
     ) where
 
 import Control.Lens
+import Data.Maybe
 import Monomer
 import Monomer.Graph
 
@@ -17,12 +18,14 @@ buildUI _ model = tree where
             , onRightClick AppAddPoint
             ] `nodeKey` "mainGraph"
         , separatorLine
-        , vstack_ [childSpacing_ 16]
+        , vstack'
             [ button "Reset" AppResetGraph
             , hgrid_ [childSpacing_ 64]
                 [ labeledCheckbox "Lock X" xLock
                 , labeledCheckbox "Lock Y" yLock
                 ]
+            , separatorLine
+            , dropdown currentFunction functionChoices et et
             ]
         ] `styleBasic` [padding 16]
     points =
@@ -31,4 +34,17 @@ buildUI _ model = tree where
             , graphColor black
             , graphSeparate
             ]
+        , if null (model ^. currentFunction)
+            then []
+            else
+                [ graphPoints $ (\x -> (x, cf x)) <$> xs
+                , graphColor brown
+                ]
         ]
+    functionChoices = Nothing:(pure <$> [0..length functions-1])
+    cf = fst $ functions!!(fromJust $ model ^. currentFunction)
+    et i = label $ if null i
+        then "No function"
+        else snd $ functions!!(fromJust i)
+    xs = [-15, (-14.95)..15]
+    vstack' = vstack_ [childSpacing_ 16]
