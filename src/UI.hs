@@ -6,6 +6,7 @@ import Control.Lens
 import Data.Maybe
 import Monomer
 import Monomer.Graph
+import TextShow
 
 import Model
 
@@ -46,6 +47,7 @@ buildUI _ model = tree where
             , graphColor black
             , graphSeparate
             , graphOnChange AppPointChange
+            , graphOnClick AppPointClicked
             ]
         , if null (model ^. currentFunction)
             then []
@@ -63,7 +65,7 @@ buildUI _ model = tree where
         , numericField_ (pointField i . _2)
             [ decimals 3
             , readOnly_ $ not $ null $ model ^. currentFunction
-            ]
+            ] `nodeKey` (showt i)
         ]
     pointField i = lens getter setter where
         getter = (^?! ix i) . _amDataPoints

@@ -7,6 +7,7 @@ import Control.Lens
 import Data.Maybe
 import Monomer
 import Monomer.Graph
+import TextShow
 
 import Model.AppModel
 
@@ -17,6 +18,7 @@ data AppEvent
     | AppPointChange Int (Double, Double)
     | AppFunctionChange (Maybe Int)
     | AppRemovePoints
+    | AppPointClicked Int
     deriving (Eq, Show)
 
 handleEvent :: AppEventHandler AppModel AppEvent
@@ -33,6 +35,7 @@ handleEvent _ _ model event = case event of
         [ Model $ model & dataPoints %~ fmap (applyFunction model)
         ]
     AppRemovePoints -> [Model $ model & dataPoints .~ []]
+    AppPointClicked i -> [SetFocusOnKey $ WidgetKey $ showt i]
 
 applyFunction :: AppModel -> (Double, Double) -> (Double, Double)
 applyFunction model p@(x, _) = newPoint where
