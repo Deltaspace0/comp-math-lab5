@@ -33,6 +33,7 @@ buildUI _ model = tree where
             [ graphPoints $ model ^. dataPoints
             , graphColor black
             , graphSeparate
+            , graphOnChange AppPointChange
             ]
         , if null (model ^. currentFunction)
             then []
