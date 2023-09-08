@@ -25,7 +25,8 @@ buildUI _ model = tree where
                 , labeledCheckbox "Lock Y" yLock
                 ]
             , separatorLine
-            , dropdown currentFunction functionChoices et et
+            , dropdown_ currentFunction functionChoices et et
+                [onChange AppFunctionChange]
             ]
         ] `styleBasic` [padding 16]
     points =
