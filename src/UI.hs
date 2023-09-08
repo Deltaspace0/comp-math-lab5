@@ -28,6 +28,16 @@ buildUI _ model = tree where
             , separatorLine
             , dropdown_ currentFunction functionChoices et et
                 [onChange AppFunctionChange]
+            , hstack_ [childSpacing_ 16]
+                [ label "x ="
+                , numericField_ searchX [decimals 3]
+                , labeledCheckbox_ "Fixed step" fixedStep
+                    [onChange AppRedistributePoints]
+                ]
+            , hstack_ [childSpacing_ 16]
+                [ label "h ="
+                , numericFieldV currentStep AppStepChange
+                ] `nodeVisible` (model ^. fixedStep)
             , separatorLine
             , vstack'
                 [ label "Add points with right mouse button"
@@ -77,6 +87,9 @@ buildUI _ model = tree where
         else snd $ functions!!(fromJust i)
     xs = [-15, (-14.95)..15]
     ps = model ^. dataPoints
-    (_, psy) = unzip ps
+    (psx, psy) = unzip ps
+    currentStep = if length psx > 1
+        then psx!!1 - psx!!0
+        else 0
     vstack' = vstack_ [childSpacing_ 16]
     hgrid' = hgrid_ [childSpacing_ 16]

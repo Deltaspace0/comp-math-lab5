@@ -8,6 +8,8 @@ module Model.AppModel
     , yLock
     , dataPoints
     , currentFunction
+    , searchX
+    , fixedStep
     , initModel
     , functions
     ) where
@@ -20,6 +22,8 @@ data AppModel = AppModel
     , _amYLock :: Bool
     , _amDataPoints :: [(Double, Double)]
     , _amCurrentFunction :: Maybe Int
+    , _amSearchX :: Double
+    , _amFixedStep :: Bool
     } deriving (Eq, Show)
 
 makeLensesWith abbreviatedFields 'AppModel
@@ -30,6 +34,8 @@ initModel = AppModel
     , _amYLock = False
     , _amDataPoints = []
     , _amCurrentFunction = Nothing
+    , _amSearchX = 0
+    , _amFixedStep = False
     }
 
 functions :: [(Double -> Double, Text)]
