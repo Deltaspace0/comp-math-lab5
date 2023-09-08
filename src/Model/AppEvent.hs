@@ -16,6 +16,7 @@ data AppEvent
     | AppAddPoint (Double, Double)
     | AppPointChange Int (Double, Double)
     | AppFunctionChange (Maybe Int)
+    | AppRemovePoints
     deriving (Eq, Show)
 
 handleEvent :: AppEventHandler AppModel AppEvent
@@ -31,6 +32,7 @@ handleEvent _ _ model event = case event of
     AppFunctionChange _ ->
         [ Model $ model & dataPoints %~ fmap (applyFunction model)
         ]
+    AppRemovePoints -> [Model $ model & dataPoints .~ []]
 
 applyFunction :: AppModel -> (Double, Double) -> (Double, Double)
 applyFunction model p@(x, _) = newPoint where

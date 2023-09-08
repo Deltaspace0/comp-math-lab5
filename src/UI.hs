@@ -30,6 +30,7 @@ buildUI _ model = tree where
             , separatorLine
             , vstack'
                 [ label "Add points with right mouse button"
+                , button "Remove all points" AppRemovePoints
                 , vscroll $ vstack' $
                     [ hgrid'
                         [ label "X:"
