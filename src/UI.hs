@@ -12,7 +12,7 @@ import Model
 
 buildUI :: UIBuilder AppModel AppEvent
 buildUI _ model = tree where
-    tree = hstack_ [childSpacing_ 16]
+    tree = hstack'
         [ graphWithData_ points
             [ lockX_ $ model ^. xLock
             , lockY_ $ model ^. yLock
@@ -28,13 +28,13 @@ buildUI _ model = tree where
             , separatorLine
             , dropdown_ currentFunction functionChoices et et
                 [onChange AppFunctionChange]
-            , hstack_ [childSpacing_ 16]
+            , hstack'
                 [ label "x ="
                 , numericField_ searchX [decimals 3]
                 , labeledCheckbox_ "Fixed step" fixedStep
                     [onChange AppRedistributePoints]
                 ]
-            , hstack_ [childSpacing_ 16]
+            , hstack'
                 [ label "h ="
                 , numericFieldV currentStep AppStepChange
                 ] `nodeVisible` (model ^. fixedStep)
@@ -72,10 +72,13 @@ buildUI _ model = tree where
             [ decimals 3
             , onChange $ \x -> AppPointChange i (x, psy!!i)
             ]
-        , numericField_ (pointField i . _2)
-            [ decimals 3
-            , readOnly_ $ not $ null $ model ^. currentFunction
-            ] `nodeKey` (showt i)
+        , hstack'
+            [ numericField_ (pointField i . _2)
+                [ decimals 3
+                , readOnly_ $ not $ null $ model ^. currentFunction
+                ] `nodeKey` (showt i)
+            , button "x" $ AppRemovePoint i
+            ]
         ]
     pointField i = lens getter setter where
         getter = (^?! ix i) . _amDataPoints
@@ -92,4 +95,5 @@ buildUI _ model = tree where
         then psx!!1 - psx!!0
         else 0
     vstack' = vstack_ [childSpacing_ 16]
+    hstack' = hstack_ [childSpacing_ 16]
     hgrid' = hgrid_ [childSpacing_ 16]

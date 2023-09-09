@@ -18,6 +18,7 @@ data AppEvent
     | AppAddPoint (Double, Double)
     | AppPointChange Int (Double, Double)
     | AppFunctionChange (Maybe Int)
+    | AppRemovePoint Int
     | AppRemovePoints
     | AppPointClicked Int
     | AppDistributePoints Int Bool
@@ -40,6 +41,10 @@ handleEvent _ _ model event = case event of
     AppFunctionChange _ ->
         [ Model $ model & dataPoints %~ fmap (applyFunction model)
         ]
+    AppRemovePoint i ->
+        [ Model $ model & dataPoints %~ rp
+        , Event $ AppRedistributePoints $ model ^. fixedStep
+        ] where rp ps = (take i ps) <> (tail $ drop i ps)
     AppRemovePoints -> [Model $ model & dataPoints .~ []]
     AppPointClicked i -> [SetFocusOnKey $ WidgetKey $ showt i]
     AppDistributePoints i v -> [Model newModel] where
