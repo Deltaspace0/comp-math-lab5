@@ -3,7 +3,8 @@
 {-# LANGUAGE TemplateHaskell #-}
 
 module Model.AppModel
-    ( Menu(..)
+    ( module Model.Method
+    , Menu(..)
     , AppModel(..)
     , xLock
     , yLock
@@ -12,12 +13,15 @@ module Model.AppModel
     , searchX
     , fixedStep
     , currentMenu
+    , currentMethod
     , initModel
     , functions
     ) where
 
 import Control.Lens
 import Data.Text (Text)
+
+import Model.Method
 
 data Menu
     = MGraph
@@ -32,6 +36,7 @@ data AppModel = AppModel
     , _amSearchX :: Double
     , _amFixedStep :: Bool
     , _amCurrentMenu :: Menu
+    , _amCurrentMethod :: Method
     } deriving (Eq, Show)
 
 makeLensesWith abbreviatedFields 'AppModel
@@ -45,6 +50,7 @@ initModel = AppModel
     , _amSearchX = 0
     , _amFixedStep = False
     , _amCurrentMenu = MGraph
+    , _amCurrentMethod = Lagrange
     }
 
 functions :: [(Double -> Double, Text)]

@@ -58,7 +58,18 @@ buildUI _ model = tree where
                 ]
             ] `styleBasic` [sizeReqW $ fixedSize 320]
         ] `styleBasic` [padding 16]
-    interpolationPanel = filler
+    interpolationPanel = vstack'
+        [ hgrid'
+            [ optionButton "Lagrange" Lagrange currentMethod
+            , optionButton "Newton" Newton currentMethod
+            , optionButton "Gauss" Gauss currentMethod
+            ]
+        , separatorLine
+        , case model ^. currentMethod of
+            Lagrange -> filler
+            Newton -> filler
+            Gauss -> filler
+        ] `styleBasic` [sizeReqW $ expandSize 100 1]
     points =
         [
             [ graphPoints ps
