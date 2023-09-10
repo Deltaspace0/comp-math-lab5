@@ -13,11 +13,13 @@ import Model
 buildUI :: UIBuilder AppModel AppEvent
 buildUI _ model = tree where
     tree = hstack'
-        [ graphWithData_ points
-            [ lockX_ $ model ^. xLock
-            , lockY_ $ model ^. yLock
-            , onRightClick AppAddPoint
-            ] `nodeKey` "mainGraph"
+        [ case model ^. currentMenu of
+            MGraph -> graphWithData_ points
+                [ lockX_ $ model ^. xLock
+                , lockY_ $ model ^. yLock
+                , onRightClick AppAddPoint
+                ] `nodeKey` "mainGraph"
+            MInter -> interpolationPanel
         , separatorLine
         , vstack'
             [ button "Reset" AppResetGraph
@@ -39,6 +41,11 @@ buildUI _ model = tree where
                 , numericFieldV currentStep AppStepChange
                 ] `nodeVisible` (model ^. fixedStep)
             , separatorLine
+            , hgrid'
+                [ optionButton "Graph" MGraph currentMenu
+                , optionButton "Interpolations" MInter currentMenu
+                ]
+            , separatorLine
             , vstack'
                 [ label "Add points with right mouse button"
                 , button "Remove all points" AppRemovePoints
@@ -51,6 +58,7 @@ buildUI _ model = tree where
                 ]
             ] `styleBasic` [sizeReqW $ fixedSize 320]
         ] `styleBasic` [padding 16]
+    interpolationPanel = filler
     points =
         [
             [ graphPoints ps

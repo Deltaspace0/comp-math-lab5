@@ -3,19 +3,26 @@
 {-# LANGUAGE TemplateHaskell #-}
 
 module Model.AppModel
-    ( AppModel(..)
+    ( Menu(..)
+    , AppModel(..)
     , xLock
     , yLock
     , dataPoints
     , currentFunction
     , searchX
     , fixedStep
+    , currentMenu
     , initModel
     , functions
     ) where
 
 import Control.Lens
 import Data.Text (Text)
+
+data Menu
+    = MGraph
+    | MInter
+    deriving (Eq, Show)
 
 data AppModel = AppModel
     { _amXLock :: Bool
@@ -24,6 +31,7 @@ data AppModel = AppModel
     , _amCurrentFunction :: Maybe Int
     , _amSearchX :: Double
     , _amFixedStep :: Bool
+    , _amCurrentMenu :: Menu
     } deriving (Eq, Show)
 
 makeLensesWith abbreviatedFields 'AppModel
@@ -36,6 +44,7 @@ initModel = AppModel
     , _amCurrentFunction = Nothing
     , _amSearchX = 0
     , _amFixedStep = False
+    , _amCurrentMenu = MGraph
     }
 
 functions :: [(Double -> Double, Text)]
