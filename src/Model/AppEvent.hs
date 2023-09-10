@@ -25,6 +25,7 @@ data AppEvent
     | AppRedistributePoints Bool
     | AppStepChange Double
     | AppInterpolate Method
+    | AppSearchXChange (Double, Double)
     deriving (Eq, Show)
 
 handleEvent :: AppEventHandler AppModel AppEvent
@@ -88,6 +89,7 @@ handleEvent _ _ model event = case event of
         where
             lagrangePolynomial = interpolateLagrange dp
             dp = model ^. dataPoints
+    AppSearchXChange (x, _) -> [Model $ model & searchX .~ x]
 
 applyFunction :: AppModel -> (Double, Double) -> (Double, Double)
 applyFunction model p@(x, _) = newPoint where

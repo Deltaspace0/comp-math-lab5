@@ -35,7 +35,9 @@ buildUI _ model = tree where
                 [ label "x ="
                 , numericField_ searchX [decimals 3]
                 , labeledCheckbox_ "Fixed step" fixedStep
-                    [onChange AppRedistributePoints]
+                    [ onChange AppRedistributePoints
+                    , onChange (const AppInit :: Bool -> AppEvent)
+                    ]
                 ]
             , hstack'
                 [ label "h ="
@@ -61,9 +63,12 @@ buildUI _ model = tree where
         ] `styleBasic` [padding 16]
     interpolationPanel = vstack'
         [ hgrid'
-            [ optionButton "Lagrange" Lagrange currentMethod
-            , optionButton "Newton" Newton currentMethod
-            , optionButton "Gauss" Gauss currentMethod
+            [ optionButton_ "Lagrange" Lagrange currentMethod
+                [onChange (const AppInit :: Method -> AppEvent)]
+            , optionButton_ "Newton" Newton currentMethod
+                [onChange (const AppInit :: Method -> AppEvent)]
+            , optionButton_ "Gauss" Gauss currentMethod
+                [onChange (const AppInit :: Method -> AppEvent)]
             ]
         , separatorLine
         , case model ^. currentMethod of
@@ -95,12 +100,18 @@ buildUI _ model = tree where
                 , graphColor brown
                 ]
         ,   [ graphPoints $ (\x -> (x, interF x)) <$> xs
-            , graphColor $ case model ^. currentMethod of
-                Lagrange -> orange
-                Newton -> green
-                Gauss -> blue
+            , graphColor interpolationColor
+            ]
+        ,   [ graphPoint (sx, interF sx)
+            , graphColor interpolationColor
+            , graphSeparate
+            , graphOnChange $ const AppSearchXChange
             ]
         ]
+    interpolationColor = case model ^. currentMethod of
+        Lagrange -> orange
+        Newton -> green
+        Gauss -> blue
     pointPanels = makePointPanel <$> [0..length ps-1]
     makePointPanel i = hgrid'
         [ numericField_ (pointField i . _1)
