@@ -40,10 +40,12 @@ library
   build-depends:
       base >=4.7 && <5
     , lens
+    , matrix
     , monomer
     , monomer-widgets
     , text
     , text-show
+    , vector
   default-language: Haskell2010
 
 executable comp-math-lab5-exe
@@ -59,10 +61,12 @@ executable comp-math-lab5-exe
       base >=4.7 && <5
     , comp-math-lab5
     , lens
+    , matrix
     , monomer
     , monomer-widgets
     , text
     , text-show
+    , vector
   default-language: Haskell2010
 
 test-suite comp-math-lab5-test
@@ -79,8 +83,10 @@ test-suite comp-math-lab5-test
       base >=4.7 && <5
     , comp-math-lab5
     , lens
+    , matrix
     , monomer
     , monomer-widgets
     , text
     , text-show
+    , vector
   default-language: Haskell2010

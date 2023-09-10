@@ -24,28 +24,36 @@ data AppEvent
     | AppDistributePoints Int Bool
     | AppRedistributePoints Bool
     | AppStepChange Double
+    | AppInterpolate Method
     deriving (Eq, Show)
 
 handleEvent :: AppEventHandler AppModel AppEvent
 handleEvent _ _ model event = case event of
-    AppInit -> []
+    AppInit -> [Event $ AppInterpolate $ model ^. currentMethod]
     AppResetGraph -> [Message "mainGraph" GraphReset]
     AppAddPoint p ->
         [ Model $ model & dataPoints %~ ((applyFunction model p):)
         , Event $ AppRedistributePoints $ model ^. fixedStep
+        , Event AppInit
         ]
     AppPointChange i p ->
         [ Model $ model & dataPoints . ix i .~ applyFunction model p
         , Event $ AppDistributePoints i $ model ^. fixedStep
+        , Event AppInit
         ]
     AppFunctionChange _ ->
         [ Model $ model & dataPoints %~ fmap (applyFunction model)
+        , Event AppInit
         ]
     AppRemovePoint i ->
         [ Model $ model & dataPoints %~ rp
         , Event $ AppRedistributePoints $ model ^. fixedStep
+        , Event AppInit
         ] where rp ps = (take i ps) <> (tail $ drop i ps)
-    AppRemovePoints -> [Model $ model & dataPoints .~ []]
+    AppRemovePoints ->
+        [ Model $ model & dataPoints .~ []
+        , Event AppInit
+        ]
     AppPointClicked i -> [SetFocusOnKey $ WidgetKey $ showt i]
     AppDistributePoints i v -> [Model newModel] where
         newModel = model & dataPoints .~ d
@@ -69,7 +77,17 @@ handleEvent _ _ model event = case event of
     AppStepChange h ->
         [ Model $ model & dataPoints . ix 1 . _1 .~ x
         , Event $ AppDistributePoints 1 True
+        , Event AppInit
         ] where x = (fst $ head $ model ^. dataPoints) + h
+    AppInterpolate method -> case method of
+        Lagrange ->
+            [ Model $ model & interPolynomial .~ lagrangePolynomial
+            ]
+        Newton -> []
+        Gauss -> []
+        where
+            lagrangePolynomial = interpolateLagrange dp
+            dp = model ^. dataPoints
 
 applyFunction :: AppModel -> (Double, Double) -> (Double, Double)
 applyFunction model p@(x, _) = newPoint where
