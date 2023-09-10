@@ -4,6 +4,7 @@ module UI
 
 import Control.Lens
 import Data.Maybe
+import Data.Text (Text)
 import Monomer
 import Monomer.Graph
 import TextShow
@@ -66,9 +67,18 @@ buildUI _ model = tree where
             ]
         , separatorLine
         , case model ^. currentMethod of
-            Lagrange -> filler
-            Newton -> filler
-            Gauss -> filler
+            Lagrange -> vstack'
+                [ label $ textPolynomial $ model ^. interPolynomial
+                , label $ textSolution $ interF sx
+                ]
+            Newton -> vstack'
+                [ label $ textPolynomial $ model ^. interPolynomial
+                , label $ textSolution $ interF sx
+                ]
+            Gauss -> vstack'
+                [ label $ textPolynomial $ model ^. interPolynomial
+                , label $ textSolution $ interF sx
+                ]
         ] `styleBasic` [sizeReqW $ expandSize 100 1]
     points =
         [
@@ -101,6 +111,7 @@ buildUI _ model = tree where
             [ numericField_ (pointField i . _2)
                 [ decimals 3
                 , readOnly_ $ not $ null $ model ^. currentFunction
+                , onChange $ (const AppInit :: Double -> AppEvent)
                 ] `nodeKey` (showt i)
             , button "x" $ AppRemovePoint i
             ]
@@ -113,6 +124,7 @@ buildUI _ model = tree where
     et i = label $ if null i
         then "No function"
         else snd $ functions!!(fromJust i)
+    sx = model ^. searchX
     xs = [-15, (-14.95)..15]
     ps = model ^. dataPoints
     interF = getInterFunction $ model ^. interPolynomial
@@ -123,3 +135,23 @@ buildUI _ model = tree where
     vstack' = vstack_ [childSpacing_ 16]
     hstack' = hstack_ [childSpacing_ 16]
     hgrid' = hgrid_ [childSpacing_ 16]
+
+textPolynomial :: [Double] -> Text
+textPolynomial cs = result where
+    result = if null cs
+        then "No solution"
+        else "f(x) = " <> nom <> (px $ fst $ head ics) <> rest
+    nom = numericToText 5 $ snd $ head ics
+    ics = reverse $ zip [0..] cs
+    rest = mconcat $ f <$> tail ics
+    f (i, x) = (formatNumber x) <> px i
+    px :: Int -> Text
+    px i
+        | i == 0 = ""
+        | i == 1 = "x "
+        | otherwise = "x^" <> (showt i) <> " "
+    formatNumber x = sign <> (numericToText 5 $ abs x) where
+        sign = if x >= 0 then "+ " else "- "
+
+textSolution :: Double -> Text
+textSolution y = "y = " <> numericToText 5 y
