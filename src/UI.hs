@@ -84,6 +84,12 @@ buildUI _ model = tree where
                 [ graphPoints $ (\x -> (x, cf x)) <$> xs
                 , graphColor brown
                 ]
+        ,   [ graphPoints $ (\x -> (x, interF x)) <$> xs
+            , graphColor $ case model ^. currentMethod of
+                Lagrange -> orange
+                Newton -> green
+                Gauss -> blue
+            ]
         ]
     pointPanels = makePointPanel <$> [0..length ps-1]
     makePointPanel i = hgrid'
@@ -109,6 +115,7 @@ buildUI _ model = tree where
         else snd $ functions!!(fromJust i)
     xs = [-15, (-14.95)..15]
     ps = model ^. dataPoints
+    interF = getInterFunction $ model ^. interPolynomial
     (psx, psy) = unzip ps
     currentStep = if length psx > 1
         then psx!!1 - psx!!0
