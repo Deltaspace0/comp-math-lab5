@@ -39,32 +39,33 @@ interpolateNewton
     :: [(Double, Double)]
     -> [[Double]]
     -> Double
-    -> [Double]
-interpolateNewton [] _ _ = []
-interpolateNewton (_:[]) _ _ = []
-interpolateNewton dp differences sx = getCoefs dp' fN where
-    leftHalf = sx <= (fst (head dp) + fst (last dp))/2
-    dp' = if leftHalf
-        then dropWhile (\(x, _) -> x < sx) dp
-        else takeWhile (\(x, _) -> x <= sx) dp
+    -> Double
+interpolateNewton [] _ _ = 0
+interpolateNewton (_:[]) _ _ = 0
+interpolateNewton dp differences sx = result where
+    result = sum $ zipWith (\dy i -> dy*(ft i)) dys [0..(n-1)]
+    ft 0 = 1
+    ft i = if leftHalf
+        then (product $ (t-) <$> [0..(i'-1)])/fact
+        else (product $ (t+) <$> [0..(i'-1)])/fact
+        where
+            fact = product [1..i']
+            i' = fromIntegral i
+    t = if leftHalf
+        then (sx-(fst (head dp')))/h
+        else (sx-(fst (last dp')))/h
     h = (fst (dp'!!1) - fst (dp'!!0))
-    n = length dp'
-    dl = length dp - n
     dys = if leftHalf
-        then head <$> (drop dl <$> differences)
-        else last <$> (dropTail dl <$> differences)
-    fN x = result where
-        result = sum $ zipWith (\dy i -> dy*(ft i)) dys [0..(n-1)]
-        ft 0 = 1
-        ft i = if leftHalf
-            then (product $ (t-) <$> [0..(i'-1)])/fact
-            else (product $ (t+) <$> [0..(i'-1)])/fact
-            where
-                fact = product [1..i']
-                i' = fromIntegral i
-        t = if leftHalf
-            then (x-(fst (head dp')))/h
-            else (x-(fst (last dp')))/h
+        then head . drop dl <$> differences
+        else last . dropTail dl <$> differences
+    leftHalf = sx <= (fst (head dp) + fst (last dp))/2
+    dl = length dp - n
+    n = length dp'
+    dp' = if leftHalf
+        then (if null twdp then [] else [last twdp]) <> dwdp
+        else twdp <> (take 1 dwdp)
+    twdp = takeWhile (\(x, _) -> x < sx) dp
+    dwdp = dropWhile (\(x, _) -> x < sx) dp
 
 getCoefs
     :: [(Double, Double)]

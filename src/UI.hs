@@ -74,15 +74,15 @@ buildUI _ model = tree where
         , case model ^. currentMethod of
             Lagrange -> vstack'
                 [ label $ textPolynomial $ model ^. interPolynomial
-                , label $ textSolution $ interF sx
+                , label $ textSolution $ model ^. searchSolution
                 ]
             Newton -> vstack'
                 [ label $ textPolynomial $ model ^. interPolynomial
-                , label $ textSolution $ interF sx
+                , label $ textSolution $ model ^. searchSolution
                 ]
             Gauss -> vstack'
                 [ label $ textPolynomial $ model ^. interPolynomial
-                , label $ textSolution $ interF sx
+                , label $ textSolution $ model ^. searchSolution
                 ]
         ] `styleBasic` [sizeReqW $ expandSize 100 1]
     points =
@@ -99,10 +99,10 @@ buildUI _ model = tree where
                 [ graphPoints $ (\x -> (x, cf x)) <$> xs
                 , graphColor brown
                 ]
-        ,   [ graphPoints $ (\x -> (x, interF x)) <$> xs
+        ,   [ graphPoints $ model ^. interGraph
             , graphColor interpolationColor
             ]
-        ,   [ graphPoint (sx, interF sx)
+        ,   [ graphPoint (sx, model ^. searchSolution)
             , graphColor interpolationColor
             , graphSeparate
             , graphOnChange $ const AppSearchXChange
@@ -138,7 +138,6 @@ buildUI _ model = tree where
     sx = model ^. searchX
     xs = [-15, (-14.95)..15]
     ps = model ^. dataPoints
-    interF = getInterFunction $ model ^. interPolynomial
     (psx, psy) = unzip ps
     currentStep = if length psx > 1
         then psx!!1 - psx!!0

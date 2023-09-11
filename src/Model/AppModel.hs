@@ -15,6 +15,8 @@ module Model.AppModel
     , currentMenu
     , currentMethod
     , interPolynomial
+    , interGraph
+    , searchSolution
     , forwardDifferences
     , initModel
     , functions
@@ -40,6 +42,8 @@ data AppModel = AppModel
     , _amCurrentMenu :: Menu
     , _amCurrentMethod :: Method
     , _amInterPolynomial :: [Double]
+    , _amInterGraph :: [(Double, Double)]
+    , _amSearchSolution :: Double
     , _amForwardDifferences :: [[Double]]
     } deriving (Eq, Show)
 
@@ -56,6 +60,8 @@ initModel = AppModel
     , _amCurrentMenu = MGraph
     , _amCurrentMethod = Lagrange
     , _amInterPolynomial = []
+    , _amInterGraph = []
+    , _amSearchSolution = 0
     , _amForwardDifferences = []
     }
 

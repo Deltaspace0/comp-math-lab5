@@ -82,17 +82,25 @@ handleEvent _ _ model event = case event of
         ] where x = (fst $ head $ model ^. dataPoints) + h
     AppInterpolate method -> case method of
         Lagrange ->
-            [ Model $ model & interPolynomial .~ lagrangePolynomial
+            [ Model $ model
+                & interPolynomial .~ lagrangePolynomial
+                & interGraph .~ lagrangeGraph
+                & searchSolution .~ interL sx
             ]
         Newton ->
             [ Model $ model
-                & interPolynomial .~ newtonPolynomial
+                & interGraph .~ newtonGraph
                 & forwardDifferences .~ differences
+                & searchSolution .~ newtonF sx
             ]
         Gauss -> []
         where
             lagrangePolynomial = interpolateLagrange dp
-            newtonPolynomial = interpolateNewton dp differences sx
+            interL = getInterFunction lagrangePolynomial
+            lagrangeGraph = (\x -> (x, interL x)) <$> xs
+            newtonGraph = (\x -> (x, newtonF x)) <$> xs
+            xs = [-15, (-14.95)..15]
+            newtonF = interpolateNewton dp differences
             differences = getDifferences dp
             sx = model ^. searchX
             dp = model ^. dataPoints
