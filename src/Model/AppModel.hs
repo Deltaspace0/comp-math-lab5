@@ -15,6 +15,7 @@ module Model.AppModel
     , currentMenu
     , currentMethod
     , interPolynomial
+    , forwardDifferences
     , initModel
     , functions
     ) where
@@ -39,6 +40,7 @@ data AppModel = AppModel
     , _amCurrentMenu :: Menu
     , _amCurrentMethod :: Method
     , _amInterPolynomial :: [Double]
+    , _amForwardDifferences :: [[Double]]
     } deriving (Eq, Show)
 
 makeLensesWith abbreviatedFields 'AppModel
@@ -54,6 +56,7 @@ initModel = AppModel
     , _amCurrentMenu = MGraph
     , _amCurrentMethod = Lagrange
     , _amInterPolynomial = []
+    , _amForwardDifferences = []
     }
 
 functions :: [(Double -> Double, Text)]

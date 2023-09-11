@@ -84,12 +84,22 @@ handleEvent _ _ model event = case event of
         Lagrange ->
             [ Model $ model & interPolynomial .~ lagrangePolynomial
             ]
-        Newton -> []
+        Newton ->
+            [ Model $ model
+                & interPolynomial .~ newtonPolynomial
+                & forwardDifferences .~ differences
+            ]
         Gauss -> []
         where
             lagrangePolynomial = interpolateLagrange dp
+            newtonPolynomial = interpolateNewton dp differences sx
+            differences = getDifferences dp
+            sx = model ^. searchX
             dp = model ^. dataPoints
-    AppSearchXChange (x, _) -> [Model $ model & searchX .~ x]
+    AppSearchXChange (x, _) ->
+        [ Model $ model & searchX .~ x
+        , Event AppInit
+        ]
 
 applyFunction :: AppModel -> (Double, Double) -> (Double, Double)
 applyFunction model p@(x, _) = newPoint where
