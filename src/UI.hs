@@ -77,14 +77,28 @@ buildUI _ model = tree where
                 , label $ textSolution $ model ^. searchSolution
                 ]
             Newton -> vstack'
-                [ label $ textPolynomial $ model ^. interPolynomial
-                , label $ textSolution $ model ^. searchSolution
+                [ label $ textSolution $ model ^. searchSolution
+                , separatorLine
+                , differencesPanel
                 ]
             Gauss -> vstack'
-                [ label $ textPolynomial $ model ^. interPolynomial
-                , label $ textSolution $ model ^. searchSolution
+                [ label $ textSolution $ model ^. searchSolution
+                , separatorLine
+                , differencesPanel
                 ]
         ] `styleBasic` [sizeReqW $ expandSize 100 1]
+    differencesPanel = scroll $ hstack' $
+        [ vstack'' $ [label "i"] <> (nfield' <$> [0..(length ps-1)])
+        , separatorLine
+        , vstack'' $ [label "x_i"] <> (nfield . fst <$> ps)
+        , vstack'' $ [label "y_i"] <> (nfield . snd <$> ps)
+        ] <> (columnDelta <$> [1..(length fds-1)])
+    nfield v = numericFieldD_ (WidgetValue v) [decimals 3]
+    nfield' v = numericFieldD_ (WidgetValue v) []
+    labelDelta i = let p = if i == 1 then "" else showt i in
+        label $ "Δ" <> p <> " y_i"
+    columnDelta i = vstack'' $ [labelDelta i] <> (nfield <$> fds!!i)
+    vstack'' ws = vstack' ws `styleBasic` [sizeReqW $ fixedSize 80]
     points =
         [
             [ graphPoints ps
@@ -138,6 +152,7 @@ buildUI _ model = tree where
     sx = model ^. searchX
     xs = [-15, (-14.95)..15]
     ps = model ^. dataPoints
+    fds = model ^. forwardDifferences
     (psx, psy) = unzip ps
     currentStep = if length psx > 1
         then psx!!1 - psx!!0
