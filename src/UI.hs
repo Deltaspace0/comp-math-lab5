@@ -49,6 +49,13 @@ buildUI _ model = tree where
                 , optionButton "Interpolations" MInter currentMenu
                 ]
             , separatorLine
+            , hgrid'
+                [ button "Interpolate" AppInterpolate
+                    `nodeEnabled` (not $ model ^. instantInter)
+                , labeledCheckbox_ "Instant" instantInter
+                    [onChange (const AppInit :: Bool -> AppEvent)]
+                ]
+            , separatorLine
             , vstack'
                 [ label "Add points with right mouse button"
                 , button "Remove all points" AppRemovePoints

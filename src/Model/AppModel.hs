@@ -18,6 +18,7 @@ module Model.AppModel
     , interGraph
     , searchSolution
     , forwardDifferences
+    , instantInter
     , initModel
     , functions
     ) where
@@ -45,6 +46,7 @@ data AppModel = AppModel
     , _amInterGraph :: [(Double, Double)]
     , _amSearchSolution :: Double
     , _amForwardDifferences :: [[Double]]
+    , _amInstantInter :: Bool
     } deriving (Eq, Show)
 
 makeLensesWith abbreviatedFields 'AppModel
@@ -63,6 +65,7 @@ initModel = AppModel
     , _amInterGraph = []
     , _amSearchSolution = 0
     , _amForwardDifferences = []
+    , _amInstantInter = True
     }
 
 functions :: [(Double -> Double, Text)]

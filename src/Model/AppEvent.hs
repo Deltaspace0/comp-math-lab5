@@ -24,14 +24,16 @@ data AppEvent
     | AppDistributePoints Int Bool
     | AppRedistributePoints Bool
     | AppStepChange Double
-    | AppInterpolate Method
+    | AppInterpolate
     | AppSearchXChange (Double, Double)
     | AppMethodChange Method
     deriving (Eq, Show)
 
 handleEvent :: AppEventHandler AppModel AppEvent
 handleEvent _ _ model event = case event of
-    AppInit -> [Event $ AppInterpolate $ model ^. currentMethod]
+    AppInit -> if model ^. instantInter
+        then [Event AppInterpolate]
+        else []
     AppResetGraph -> [Message "mainGraph" GraphReset]
     AppAddPoint p ->
         [ Model $ model & dataPoints %~ ((applyFunction model p):)
@@ -81,7 +83,7 @@ handleEvent _ _ model event = case event of
         , Event $ AppDistributePoints 1 True
         , Event AppInit
         ] where x = (fst $ head $ model ^. dataPoints) + h
-    AppInterpolate method -> case method of
+    AppInterpolate -> case model ^. currentMethod of
         Lagrange ->
             [ Model $ model
                 & interPolynomial .~ lagrangePolynomial
