@@ -4,6 +4,7 @@ module Model.Method
     , getDifferences
     , interpolateLagrange
     , interpolateNewton
+    , interpolateGauss
     ) where
 
 import Data.Matrix hiding (toList)
@@ -66,6 +67,56 @@ interpolateNewton dp differences sx = result where
         else twdp <> (take 1 dwdp)
     twdp = takeWhile (\(x, _) -> x < sx) dp
     dwdp = dropWhile (\(x, _) -> x < sx) dp
+
+interpolateGauss
+    :: [(Double, Double)]
+    -> [[Double]]
+    -> Double
+    -> Double
+interpolateGauss [] _ _ = 0
+interpolateGauss (_:[]) _ _ = 0
+interpolateGauss dp differences sx = result where
+    result = if sx >= (fst (head dp) + fst (last dp))/2
+        then interpolateGaussForward dp differences sx
+        else interpolateGaussBackward dp differences sx
+
+interpolateGaussForward
+    :: [(Double, Double)]
+    -> [[Double]]
+    -> Double
+    -> Double
+interpolateGaussForward dp differences sx = result where
+    result = sum $ zipWith (\dy i -> dy*(ft i)) dys [0..(2*nd)]
+    ft 0 = 1
+    ft i = (product $ (t+) <$> ins)/(product [1..i']) where
+        ins = take i $ 0:([1..] >>= \x -> [-x, x])
+        i' = fromIntegral i
+    t = (sx-(fst $ dp!!nd))/h
+    h = (fst (dp!!1) - fst (dp!!0))
+    dys = (\(a, b) -> a!!b) <$> ddd
+    ddd = takeWhile lengthCheck $ zip differences diffIndices
+    lengthCheck (a, b) = b < length a
+    diffIndices = [nd, (nd-1)..] >>= \x -> [x, x]
+    nd = -1+(length $ takeWhile (\(x, _) -> x < sx) dp)
+
+interpolateGaussBackward
+    :: [(Double, Double)]
+    -> [[Double]]
+    -> Double
+    -> Double
+interpolateGaussBackward dp differences sx = result where
+    result = sum $ zipWith (\dy i -> dy*(ft i)) dys [0..(2*nd)]
+    ft 0 = 1
+    ft i = (product $ (t+) <$> ins)/(product [1..i']) where
+        ins = take i $ 0:([1..] >>= \x -> [x, -x])
+        i' = fromIntegral i
+    t = (sx-(fst $ dp!!nd))/h
+    h = (fst (dp!!1) - fst (dp!!0))
+    dys = (\(a, b) -> a!!b) <$> ddd
+    ddd = takeWhile lengthCheck $ zip differences diffIndices
+    lengthCheck (a, b) = b < length a
+    diffIndices = tail $ [nd, (nd-1)..] >>= \x -> [x, x]
+    nd = length $ takeWhile (\(x, _) -> x < sx) dp
 
 getCoefs
     :: [(Double, Double)]
