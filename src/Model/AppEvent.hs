@@ -26,6 +26,7 @@ data AppEvent
     | AppStepChange Double
     | AppInterpolate Method
     | AppSearchXChange (Double, Double)
+    | AppMethodChange Method
     deriving (Eq, Show)
 
 handleEvent :: AppEventHandler AppModel AppEvent
@@ -108,6 +109,13 @@ handleEvent _ _ model event = case event of
         [ Model $ model & searchX .~ x
         , Event AppInit
         ]
+    AppMethodChange method -> if method == Lagrange
+        then [Event AppInit]
+        else
+            [ Model $ model & fixedStep .~ True
+            , Event $ AppRedistributePoints True
+            , Event AppInit
+            ]
 
 applyFunction :: AppModel -> (Double, Double) -> (Double, Double)
 applyFunction model p@(x, _) = newPoint where

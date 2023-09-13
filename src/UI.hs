@@ -37,7 +37,7 @@ buildUI _ model = tree where
                 , labeledCheckbox_ "Fixed step" fixedStep
                     [ onChange AppRedistributePoints
                     , onChange (const AppInit :: Bool -> AppEvent)
-                    ]
+                    ] `nodeEnabled` (method == Lagrange)
                 ]
             , hstack'
                 [ label "h ="
@@ -64,14 +64,14 @@ buildUI _ model = tree where
     interpolationPanel = vstack'
         [ hgrid'
             [ optionButton_ "Lagrange" Lagrange currentMethod
-                [onChange (const AppInit :: Method -> AppEvent)]
+                [onChange AppMethodChange]
             , optionButton_ "Newton" Newton currentMethod
-                [onChange (const AppInit :: Method -> AppEvent)]
+                [onChange AppMethodChange]
             , optionButton_ "Gauss" Gauss currentMethod
-                [onChange (const AppInit :: Method -> AppEvent)]
+                [onChange AppMethodChange]
             ]
         , separatorLine
-        , case model ^. currentMethod of
+        , case method of
             Lagrange -> vstack'
                 [ label $ textPolynomial $ model ^. interPolynomial
                 , label $ textSolution $ model ^. searchSolution
@@ -122,7 +122,7 @@ buildUI _ model = tree where
             , graphOnChange $ const AppSearchXChange
             ]
         ]
-    interpolationColor = case model ^. currentMethod of
+    interpolationColor = case method of
         Lagrange -> orange
         Newton -> green
         Gauss -> blue
@@ -153,6 +153,7 @@ buildUI _ model = tree where
     xs = [-15, (-14.95)..15]
     ps = model ^. dataPoints
     fds = model ^. forwardDifferences
+    method = model ^. currentMethod
     (psx, psy) = unzip ps
     currentStep = if length psx > 1
         then psx!!1 - psx!!0
