@@ -33,7 +33,10 @@ buildUI _ model = tree where
                 [onChange AppFunctionChange]
             , hstack'
                 [ label "x ="
-                , numericField_ searchX [decimals 3]
+                , numericField_ searchX
+                    [ decimals 3
+                    , onChange (const AppInit :: Double -> AppEvent)
+                    ]
                 , labeledCheckbox_ "Fixed step" fixedStep
                     [ onChange AppRedistributePoints
                     , onChange (const AppInit :: Bool -> AppEvent)
