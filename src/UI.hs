@@ -103,7 +103,7 @@ buildUI _ model = tree where
         , vstack'' $ [label "x_i"] <> (nfield . fst <$> ps)
         , vstack'' $ [label "y_i"] <> (nfield . snd <$> ps)
         ] <> (columnDelta <$> [1..(length fds-1)])
-    nfield v = numericFieldD_ (WidgetValue v) [decimals 3]
+    nfield v = numericFieldD_ (WidgetValue v) [decimals 4]
     nfield' v = numericFieldD_ (WidgetValue v) []
     labelDelta i = let p = if i == 1 then "" else showt i in
         label $ "Δ" <> p <> " y_i"
@@ -139,12 +139,12 @@ buildUI _ model = tree where
     pointPanels = makePointPanel <$> [0..length ps-1]
     makePointPanel i = hgrid'
         [ numericField_ (pointField i . _1)
-            [ decimals 3
+            [ decimals 4
             , onChange $ \x -> AppPointChange i (x, psy!!i)
             ]
         , hstack'
             [ numericField_ (pointField i . _2)
-                [ decimals 3
+                [ decimals 4
                 , readOnly_ $ not $ null $ model ^. currentFunction
                 , onChange $ (const AppInit :: Double -> AppEvent)
                 ] `nodeKey` (showt i)
